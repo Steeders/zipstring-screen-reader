@@ -8,9 +8,10 @@ const SITE = process.env.SITE_URL ?? "https://zipstring.com";
 const PDP = `${SITE}/products/zipstring-aracna`;
 const OUT = process.env.OUT_DIR ?? path.join("transcripts", new Date().toISOString().replace(/[:.]/g, "-"));
 
-// The cursor text of a real checkout button starts with "Checkout" ("Checkout+ | $81.96", "Checkout without coverage").
-// Matching anywhere would catch "Taxes and shipping calculated at checkout".
-const CHECKOUT_BUTTON = /^check ?out\b/i;
+// A real checkout button's cursor text starts with "Checkout" and ends with "button"
+// ("Checkout+ | $81.96 button", "Checkout without coverage button"). Looser patterns caught
+// "calculated at checkout" (run 1) and Redo's "Checkout+" label (run 2).
+const CHECKOUT_BUTTON = /^check ?out.*\bbutton$/is;
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -95,6 +96,8 @@ test.describe("ZipString Aracna: product page to checkout with VoiceOver", () =>
     });
 
     await j.step("Tab through the drawer", "Keyboard-only path from where focus landed: does Tab reach both checkout buttons and stay inside the open drawer?", async () => {
+      // Step off the drawer header first: in run 2, Tab pressed while VoiceOver sat on the header never moved.
+      await j.cmd("VO+Right (next item)", () => vo.next());
       for (let i = 0; i < 14; i++) {
         await j.cmd("Tab", () => vo.press("Tab", { capture: true }));
         j.note(`Tab ${i + 1} focus: ${await focusSummary(page)}`);
@@ -108,11 +111,11 @@ test.describe("ZipString Aracna: product page to checkout with VoiceOver", () =>
       await j.cmd("VO+Cmd+F4 (move cursor to keyboard focus)", () =>
         vo.perform(vo.keyboardCommands.moveCursorToKeyboardFocus, { capture: true }),
       );
-      for (let i = 0; i < 45 && !reachedCheckoutControl; i++) {
+      for (let i = 0; i < 55 && !reachedCheckoutControl; i++) {
         const c = await j.cmd("VO+Right (next item)", () => vo.next());
         reachedCheckoutControl = CHECKOUT_BUTTON.test(c.itemText);
       }
-      if (!reachedCheckoutControl) j.note("VoiceOver never landed on a checkout button within 45 moves through the drawer.");
+      if (!reachedCheckoutControl) j.note("VoiceOver never landed on a checkout button within 55 moves through the drawer.");
     });
 
     await j.step("Go to checkout", "Press the checkout button VoiceOver found and listen to the first thing the checkout page says.", async () => {
