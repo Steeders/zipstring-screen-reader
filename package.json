@@ -1,0 +1,19 @@
+{
+  "name": "zipstring-screen-reader",
+  "private": true,
+  "description": "Real VoiceOver driven through scripted zipstring.com shopper journeys; transcripts for a listener-style review.",
+  "scripts": {
+    "test:voiceover": "playwright test --config ./playwright.config.ts"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "devDependencies": {
+    "@guidepup/guidepup": "0.35.0",
+    "@guidepup/playwright": "0.19.1",
+    "@guidepup/setup": "0.29.2",
+    "@playwright/test": "1.64.0",
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3"
+  }
+}

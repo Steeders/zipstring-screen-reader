@@ -1,0 +1,42 @@
+name: VoiceOver journeys
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: voiceover
+  cancel-in-progress: false
+
+jobs:
+  aracna-checkout:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      OUT_DIR: transcripts/aracna-checkout
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Set up macOS for VoiceOver automation
+        run: npx guidepup setup --ci --macos-record
+      - name: Install VoiceOver assets for this Guidepup version
+        run: npx guidepup install voiceover
+      - run: npx playwright install webkit
+      - name: Run the journey with VoiceOver
+        run: npm run test:voiceover
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: voiceover-aracna-checkout-${{ github.run_id }}
+          path: |
+            transcripts/**/*
+            test-results/**/*
+            playwright-report/**/*
+            recordings/**/*
+          retention-days: 30

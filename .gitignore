@@ -1,0 +1,6 @@
+node_modules/
+transcripts/
+test-results/
+playwright-report/
+recordings/
+.DS_Store
