@@ -28,6 +28,15 @@ jobs:
       - name: Install VoiceOver assets for this Guidepup version
         run: npx guidepup install voiceover
       - run: npx playwright install webkit
+      # The runner's bottom-right hot corner opens a Quick Note, which steals the VoiceOver cursor mid-journey.
+      - name: Turn off hot corners
+        run: |
+          for c in tl tr bl br; do
+            defaults write com.apple.dock "wvous-$c-corner" -int 1
+            defaults write com.apple.dock "wvous-$c-modifier" -int 0
+          done
+          killall Dock || true
+          osascript -e 'quit app "Notes"' || true
       - name: Run the journey with VoiceOver
         run: npm run test:voiceover
       - uses: actions/upload-artifact@v4
