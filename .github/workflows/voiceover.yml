@@ -2,6 +2,11 @@ name: VoiceOver journeys
 
 on:
   workflow_dispatch:
+    inputs:
+      preview_theme_id:
+        description: "Shopify theme id to preview (blank = the live theme)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -16,6 +21,7 @@ jobs:
     timeout-minutes: 45
     env:
       OUT_DIR: transcripts/aracna-checkout
+      PREVIEW_THEME_ID: ${{ inputs.preview_theme_id }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6

@@ -5,7 +5,8 @@ import type { VoiceOverPlaywright } from "@guidepup/playwright";
 import { Journey } from "./journey";
 
 const SITE = process.env.SITE_URL ?? "https://zipstring.com";
-const PDP = `${SITE}/products/zipstring-aracna`;
+const PREVIEW_THEME_ID = process.env.PREVIEW_THEME_ID ?? "";
+const PDP = `${SITE}/products/zipstring-aracna${PREVIEW_THEME_ID ? `?preview_theme_id=${PREVIEW_THEME_ID}` : ""}`;
 const OUT = process.env.OUT_DIR ?? path.join("transcripts", new Date().toISOString().replace(/[:.]/g, "-"));
 
 // A real checkout button's cursor text starts with "Checkout" and ends with "button"
@@ -47,7 +48,7 @@ test.describe("ZipString Aracna: product page to checkout with VoiceOver", () =>
   test("choose the 2-pack, add to cart, reach checkout", async ({ page, voiceOver: vo, browserName }) => {
     const j = new Journey(page, vo, OUT, {
       journey: "Aracna product page → 2-pack → add to cart → cart drawer → checkout (VoiceOver, macOS)",
-      site: SITE,
+      site: SITE + (PREVIEW_THEME_ID ? ` (preview theme ${PREVIEW_THEME_ID})` : ""),
       browser: browserName,
       runner: process.env.CI ? `GitHub Actions ${process.env.ImageOS ?? ""} run ${process.env.GITHUB_RUN_ID ?? ""}`.trim() : "local",
     });
