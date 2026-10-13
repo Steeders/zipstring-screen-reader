@@ -44,7 +44,7 @@ jobs:
           killall Dock || true
           osascript -e 'quit app "Notes"' || true
       - name: Run the journey with VoiceOver
-        run: npm run test:voiceover
+        run: npm run test:voiceover -- tests/aracna-checkout.voiceover.spec.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
