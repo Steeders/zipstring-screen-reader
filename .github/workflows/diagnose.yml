@@ -23,7 +23,7 @@ jobs:
         run: npx guidepup setup --ci
       - run: npx playwright install webkit
       - name: Dump the accessibility tree
-        run: npx playwright test --config ./playwright.config.ts tests/diagnose
+        run: npx playwright test --config ./playwright.config.ts tests/diagnose/empty-menus-fixes.spec.ts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
